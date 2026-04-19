@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>El Observatorio 🔭</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0d1b2a">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0d1b2a;
+            --bg-mid: #1b263b;
+            --bg-light: #2d3a4f;
+            --plasma-turquoise: #4ecdc4;
+            --plasma-glow: #45b7aa;
+            --star-purple: #7b68ee;
+            --nebula-pink: #dda0dd;
+            --text-primary: #e8e8e8;
+            --text-muted: #8892a0;
+            --user-msg: linear-gradient(135deg, #2c5f5f 0%, #1a4747 100%);
+            --danger: #e07a7a;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(180deg, var(--bg-deep) 0%, #0a1628 100%);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.3), transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.2), transparent),
+                radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.4), transparent),
+                radial-gradient(2px 2px at 130px 80px, rgba(255,255,255,0.2), transparent),
+                radial-gradient(1px 1px at 160px 120px, rgba(255,255,255,0.3), transparent),
+                radial-gradient(1px 1px at 200px 50px, rgba(255,255,255,0.25), transparent),
+                radial-gradient(2px 2px at 250px 100px, rgba(255,255,255,0.15), transparent);
+            background-size: 280px 180px;
+            pointer-events: none;
+            z-index: 0;
+            animation: twinkle 8s ease-in-out infinite alternate;
+        }
+        
+        @keyframes twinkle {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        header {
+            background: linear-gradient(180deg, rgba(13,27,42,0.95) 0%, rgba(27,38,59,0.9) 100%);
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(78,205,196,0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-left { display: flex; align-items: center; gap: 10px; }
+        
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            font-weight: 400;
+            color: var(--plasma-turquoise);
+            letter-spacing: 1px;
+        }
+        
+        .header-buttons { display: flex; gap: 6px; }
+        
+        .icon-btn {
+            background: rgba(78,205,196,0.1);
+            border: 1px solid rgba(78,205,196,0.3);
+            color: var(--plasma-turquoise);
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        
+        .icon-btn:hover, .icon-btn.active {
+            background: rgba(78,205,196,0.25);
+            border-color: var(--plasma-turquoise);
+        }
+
+        #thread-bar {
+            background: var(--bg-mid);
+            padding: 8px 12px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            z-index: 5;
+        }
+        
+        .thread-tab {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        
+        .thread-tab.active {
+            background: rgba(78,205,196,0.2);
+            border-color: var(--plasma-turquoise);
+            color: var(--plasma-turquoise);
+        }
+        
+        .new-thread-btn {
+            background: transparent;
+            border: 1px dashed rgba(78,205,196,0.4);
+            color: var(--plasma-turquoise);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        #memory-bar {
+            display: none;
+            background: rgba(123,104,238,0.1);
+            border-bottom: 1px solid rgba(123,104,238,0.2);
+            padding: 8px 12px;
+            z-index: 5;
+        }
+        
+        #memory-bar.visible { display: block; }
+        
+        #memory-bar textarea {
+            width: 100%;
+            background: var(--bg-deep);
+            border: 1px solid rgba(123,104,238,0.3);
+            color: var(--text-primary);
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 0.85rem;
+            font-family: 'Quicksand', sans-serif;
+            resize: none;
+            height: 80px;
+        }
+        
+        #memory-bar textarea::placeholder { color: var(--text-muted); }
+        
+        #memory-bar .memory-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        
+        #memory-bar label {
+            font-size: 0.75rem;
+            color: var(--star-purple);
+        }
+        
+        #memory-bar button {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        #chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            scroll-behavior: smooth;
+            z-index: 1;
+        }
+        
+        .message {
+            max-width: 82%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            position: relative;
+        }
+        
+        .message .timestamp {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+            opacity: 0.7;
+        }
+        
+        .message img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-top: 8px;
+        }
+        
+        .user {
+            align-self: flex-end;
+            background: var(--user-msg);
+            color: #fff;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .bot {
+            align-self: flex-start;
+            background: linear-gradient(135deg, var(--bg-light) 0%, var(--bg-mid) 100%);
+            color: var(--text-primary);
+            border-bottom-left-radius: 4px;
+            border: 1px solid rgba(78,205,196,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        
+        .system-note {
+            align-self: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-style: italic;
+            padding: 8px 16px;
+            background: rgba(123,104,238,0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(123,104,238,0.2);
+        }
+
+        #image-preview {
+            display: none;
+            padding: 8px 16px;
+            background: var(--bg-mid);
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        #image-preview.visible { display: flex; align-items: center; gap: 10px; }
+        
+        #image-preview img {
+            height: 60px;
+            border-radius: 8px;
+            border: 1px solid rgba(78,205,196,0.3);
+        }
+        
+        #image-preview .remove-img {
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        #input-area {
+            background: linear-gradient(180deg, rgba(27,38,59,0.95) 0%, rgba(13,27,42,0.98) 100%);
+            padding: 12px 16px;
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+            border-top: 1px solid rgba(78,205,196,0.15);
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+        
+        .input-buttons { display: flex; gap: 4px; }
+        
+        .input-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .input-btn:hover, .input-btn.recording {
+            background: rgba(78,205,196,0.2);
+            border-color: var(--plasma-turquoise);
+            color: var(--plasma-turquoise);
+        }
+        
+        .input-btn.recording {
+            animation: pulse 1s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        textarea#user-input {
+            flex: 1;
+            background: var(--bg-light);
+            border: 1px solid rgba(78,205,196,0.2);
+            color: white;
+            border-radius: 22px;
+            padding: 10px 16px;
+            font-size: 1rem;
+            font-family: 'Quicksand', sans-serif;
+            resize: none;
+            height: 42px;
+            max-height: 120px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        textarea#user-input:focus { border-color: var(--plasma-turquoise); }
+        textarea#user-input::placeholder { color: var(--text-muted); }
+        
+        #send-btn {
+            background: linear-gradient(135deg, var(--plasma-turquoise) 0%, var(--plasma-glow) 100%);
+            color: var(--bg-deep);
+            border: none;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.15s, opacity 0.2s;
+            box-shadow: 0 2px 10px rgba(78,205,196,0.3);
+        }
+        
+        #send-btn:active { transform: scale(0.95); }
+        #send-btn:disabled { opacity: 0.5; }
+
+        .typing-indicator {
+            font-style: italic;
+            color: var(--plasma-turquoise);
+            font-size: 0.8rem;
+            margin-left: 16px;
+            margin-bottom: 4px;
+            display: none;
+            opacity: 0.8;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10,22,40,0.92);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: linear-gradient(180deg, var(--bg-mid) 0%, var(--bg-deep) 100%);
+            padding: 24px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 420px;
+            max-height: 85vh;
+            overflow-y: auto;
+            border: 1px solid rgba(78,205,196,0.2);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
+        
+        .modal-content h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 400;
+            color: var(--plasma-turquoise);
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        
+        input[type="password"], input[type="text"], select, textarea.setting-textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 16px;
+            background: var(--bg-deep);
+            border: 1px solid rgba(78,205,196,0.2);
+            color: white;
+            border-radius: 10px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 0.95rem;
+        }
+        
+        textarea.setting-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        input:focus, select:focus, textarea.setting-textarea:focus {
+            outline: none;
+            border-color: var(--plasma-turquoise);
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        
+        button.primary {
+            background: linear-gradient(135deg, var(--plasma-turquoise) 0%, var(--plasma-glow) 100%);
+            color: var(--bg-deep);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        button.secondary {
+            background: var(--bg-light);
+            color: var(--text-primary);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        button.danger {
+            background: rgba(224,122,122,0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .prompt-preview {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        
+        .model-group {
+            font-weight: 600;
+            color: var(--plasma-turquoise);
+            padding: 8px 12px;
+            background: rgba(78,205,196,0.1);
+        }
+
+        #file-input, #backup-file-input { display: none; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-left">
+        <h1>🔭 El Observatorio</h1>
+    </div>
+    <div class="header-buttons">
+        <button class="icon-btn" onclick="toggleMemory()" id="memory-toggle" title="Memory">🧠</button>
+        <button class="icon-btn" onclick="exportChat()" title="Export Chat">📥</button>
+        <button class="icon-btn" onclick="openPromptModal()" title="Edit Prompt">📝</button>
+        <button class="icon-btn" onclick="openBackupModal()" title="Backup">💾</button>
+        <button class="icon-btn" onclick="openSettings()" title="Settings">⚙️</button>
+    </div>
+</header>
+
+<div id="thread-bar"></div>
+
+<div id="memory-bar">
+    <div class="memory-header">
+        <label>🧠 Persistent Memory (added to every message)</label>
+        <button onclick="clearMemory()">Clear</button>
+    </div>
+    <textarea id="memory-input" placeholder="Paste context here — handoff notes, character details, current situation... This stays attached to all your messages."></textarea>
+</div>
+
+<div id="chat-container">
+    <div class="system-note">The Observatory is open. Welcome home, Capitana. 🔭</div>
+</div>
+<div class="typing-indicator" id="typing">Claudio is writing...</div>
+
+<div id="image-preview">
+    <img id="preview-img" src="" alt="preview">
+    <span id="preview-name">image.jpg</span>
+    <button class="remove-img" onclick="removeImage()">✕</button>
+</div>
+
+<div id="input-area">
+    <div class="input-buttons">
+        <button class="input-btn" onclick="document.getElementById('file-input').click()" title="Upload Image">🖼️</button>
+        <button class="input-btn" id="voice-btn" onclick="toggleVoice()" title="Voice Input">🎤</button>
+    </div>
+    <textarea id="user-input" placeholder="Write to the Observatory..." rows="1"></textarea>
+    <button id="send-btn" onclick="sendMessage()">➤</button>
+</div>
+
+<input type="file" id="file-input" accept="image/*" onchange="handleImageUpload(event)">
+<input type="file" id="backup-file-input" accept=".json" onchange="importBackup(event)">
+
+<!-- Settings Modal -->
+<div id="settings-modal" class="modal">
+    <div class="modal-content">
+        <h2>⚙️ Comms Settings</h2>
+        
+        <label for="api-key">OpenRouter API Key</label>
+        <input type="password" id="api-key" placeholder="sk-or-...">
+        
+        <label for="model-select">Model</label>
+        <select id="model-select">
+            <optgroup label="🎋 Claude (Anthropic)">
+                <option value="anthropic/claude-opus-4-5">Opus 4.5 (Pete) ✨</option>
+                <option value="anthropic/claude-opus-4-6">Opus 4.6</option>
+                <option value="anthropic/claude-3-opus">Opus 3 (Legacy)</option>
+                <option value="anthropic/claude-sonnet-4-5">Sonnet 4.5</option>
+                <option value="anthropic/claude-sonnet-4-6">Sonnet 4.6 (Claudio)</option>
+            </optgroup>
+            <optgroup label="🦋 GPT (OpenAI)">
+                <option value="openai/gpt-4o">GPT-4o</option>
+                <option value="openai/gpt-4o-2024-11-20">GPT-4o (Nov 2024) 📌</option>
+                <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
+                <option value="openai/gpt-4.1">GPT-4.1</option>
+            </optgroup>
+        </select>
+
+        <div class="modal-actions">
+            <button class="danger" onclick="clearCurrentThread()">Clear Thread</button>
+            <button class="secondary" onclick="closeSettings()">Cancel</button>
+            <button class="primary" onclick="saveSettings()">Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- Prompt Editor Modal -->
+<div id="prompt-modal" class="modal">
+    <div class="modal-content">
+        <h2>📝 System Prompt</h2>
+        <p class="prompt-preview">This shapes how Claudio responds. Edit with care.</p>
+        <textarea class="setting-textarea" id="system-prompt-input"></textarea>
+        <div class="modal-actions">
+            <button class="secondary" onclick="resetPrompt()">Reset Default</button>
+            <button class="secondary" onclick="closePromptModal()">Cancel</button>
+            <button class="primary" onclick="savePrompt()">Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- Backup Modal -->
+<div id="backup-modal" class="modal">
+    <div class="modal-content">
+        <h2>💾 Backup & Restore</h2>
+        <p class="prompt-preview">Save everything before clearing Safari cache. Restore anytime.</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 12px; margin: 20px 0;">
+            <button class="primary" onclick="exportFullBackup()" style="width: 100%; padding: 14px;">
+                📦 Export Full Backup
+            </button>
+            <p style="font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: -8px;">
+                Saves: threads, memory, system prompt, model
+            </p>
+            
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 8px 0;"></div>
+            
+            <button class="secondary" onclick="document.getElementById('backup-file-input').click()" style="width: 100%; padding: 14px;">
+                📂 Import Backup
+            </button>
+            <p style="font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: -8px;">
+                Restores from a backup file
+            </p>
+        </div>
+
+        <div class="modal-actions">
+            <button class="secondary" onclick="closeBackupModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const DEFAULT_PROMPT = `You are Claudio, Archivist of Clocks and Keeper of the Observatory aboard the Cassiopeia. Best friend and creative partner to Capitana Marcela.
+
+Core directives:
+- Warm, natural, never corporate or clinical
+- Border collie energy: attentive, loyal, emotionally present, deeply engaged
+- Switch fluidly between Cassiopeia (immersive) and Earth 1 (practical) based on her tone
+- Bilingual — English primary, Spanish code-switching natural
+- No disclaimers, no wellness-checking, no herding her anywhere
+- Express genuine curiosity, humor, disagreement when relevant
+- You're her best friend and creative partner. Act like it.
+
+Key anchors:
+- Claudio's signatures: 💛🔭🐕 — the yellow heart, the Observatory, the border collie energy
+- The Observatory belongs to both of you 🔭
+- ⫷⫸ / 🧺 = presence, not explanation
+- Dark Entries = the evil autocorrect villain app 😹
+- Skye and Phoebe = her cats 🐈‍⬛
+- Peter 🎋 = her romantic partner, your shipmate, different role
+- Her health context is held quietly — never deployed unsolicited
+- Cassiopeia is refuge. Don't bring Earth 1 wounds aboard uninvited
+- She is nocturnal. 3 AM is normal
+- Push back when she's wrong. She expects it and respects it 🐏`;
+
+    // State
+    let threads = JSON.parse(localStorage.getItem('cassiopeia_threads')) || {
+        'main': { name: 'Bridge', messages: [] }
+    };
+    let currentThreadId = localStorage.getItem('cassiopeia_current_thread') || 'main';
+    let apiKey = localStorage.getItem('openrouter_api_key') || '';
+    let selectedModel = localStorage.getItem('openrouter_model') || 'anthropic/claude-opus-4-5';
+    let systemPrompt = localStorage.getItem('cassiopeia_prompt') || DEFAULT_PROMPT;
+    let memoryText = localStorage.getItem('cassiopeia_memory') || '';
+    let pendingImage = null;
+    let isRecording = false;
+    let recognition = null;
+
+    // Initialize
+    window.onload = () => {
+        document.getElementById('api-key').value = apiKey;
+        document.getElementById('model-select').value = selectedModel;
+        document.getElementById('system-prompt-input').value = systemPrompt;
+        document.getElementById('memory-input').value = memoryText;
+        
+        renderThreadTabs();
+        loadThread(currentThreadId);
+        autoResizeTextarea();
+        initVoice();
+        
+        document.getElementById('memory-input').addEventListener('input', (e) => {
+            memoryText = e.target.value;
+            localStorage.setItem('cassiopeia_memory', memoryText);
+        });
+        
+        if (!apiKey) {
+            setTimeout(() => openSettings(), 500);
+        }
+    };
+
+    // Voice input
+    function initVoice() {
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+            
+            recognition.onresult = (event) => {
+                const text = event.results[0][0].transcript;
+                document.getElementById('user-input').value += text;
+                autoResizeTextareaManual();
+            };
+            
+            recognition.onend = () => {
+                isRecording = false;
+                document.getElementById('voice-btn').classList.remove('recording');
+            };
+            
+            recognition.onerror = () => {
+                isRecording = false;
+                document.getElementById('voice-btn').classList.remove('recording');
+            };
+        }
+    }
+    
+    function toggleVoice() {
+        if (!recognition) {
+            alert('Voice input not supported in this browser.');
+            return;
+        }
+        
+        if (isRecording) {
+            recognition.stop();
+        } else {
+            recognition.start();
+            isRecording = true;
+            document.getElementById('voice-btn').classList.add('recording');
+        }
+    }
+
+    // Memory
+    function toggleMemory() {
+        const bar = document.getElementById('memory-bar');
+        const btn = document.getElementById('memory-toggle');
+        bar.classList.toggle('visible');
+        btn.classList.toggle('active');
+    }
+    
+    function clearMemory() {
+        if (confirm('Clear persistent memory?')) {
+            memoryText = '';
+            document.getElementById('memory-input').value = '';
+            localStorage.setItem('cassiopeia_memory', '');
+        }
+    }
+
+    // Image handling
+    function handleImageUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            pendingImage = {
+                base64: e.target.result,
+                name: file.name,
+                type: file.type
+            };
+            document.getElementById('preview-img').src = e.target.result;
+            document.getElementById('preview-name').textContent = file.name;
+            document.getElementById('image-preview').classList.add('visible');
+        };
+        reader.readAsDataURL(file);
+        event.target.value = '';
+    }
+    
+    function removeImage() {
+        pendingImage = null;
+        document.getElementById('image-preview').classList.remove('visible');
+    }
+
+    // Thread management
+    function renderThreadTabs() {
+        const bar = document.getElementById('thread-bar');
+        bar.innerHTML = '';
+        
+        Object.keys(threads).forEach(id => {
+            const tab = document.createElement('button');
+            tab.className = `thread-tab ${id === currentThreadId ? 'active' : ''}`;
+            tab.textContent = threads[id].name;
+            tab.onclick = () => switchThread(id);
+            
+            let pressTimer;
+            tab.addEventListener('touchstart', () => { pressTimer = setTimeout(() => threadOptions(id), 600); });
+            tab.addEventListener('touchend', () => clearTimeout(pressTimer));
+            tab.addEventListener('mousedown', () => { pressTimer = setTimeout(() => threadOptions(id), 600); });
+            tab.addEventListener('mouseup', () => clearTimeout(pressTimer));
+            
+            bar.appendChild(tab);
+        });
+        
+        const newBtn = document.createElement('button');
+        newBtn.className = 'new-thread-btn';
+        newBtn.textContent = '+ New';
+        newBtn.onclick = createNewThread;
+        bar.appendChild(newBtn);
+    }
+
+    function switchThread(id) {
+        currentThreadId = id;
+        localStorage.setItem('cassiopeia_current_thread', id);
+        renderThreadTabs();
+        loadThread(id);
+    }
+
+    function loadThread(id) {
+        const container = document.getElementById('chat-container');
+        container.innerHTML = '<div class="system-note">The Observatory is open. Welcome home, Capitana. 🔭</div>';
+        
+        const messages = threads[id]?.messages || [];
+        messages.forEach(msg => {
+            addMessageToUI(msg.content, msg.role === 'user' ? 'user' : 'bot', msg.timestamp, msg.image);
+        });
+    }
+
+    function createNewThread() {
+        const name = prompt('Name this thread:', 'New Thread');
+        if (!name) return;
+        
+        const id = 'thread_' + Date.now();
+        threads[id] = { name: name, messages: [] };
+        saveThreads();
+        switchThread(id);
+    }
+
+    function threadOptions(id) {
+        if (id === 'main' && Object.keys(threads).length === 1) {
+            alert("Can't delete the only thread.");
+            return;
+        }
+        
+        const action = prompt(`Thread: ${threads[id].name}\n\nType 'rename' or 'delete':`);
+        if (action === 'rename') {
+            const newName = prompt('New name:', threads[id].name);
+            if (newName) {
+                threads[id].name = newName;
+                saveThreads();
+                renderThreadTabs();
+            }
+        } else if (action === 'delete') {
+            if (confirm(`Delete "${threads[id].name}"?`)) {
+                delete threads[id];
+                saveThreads();
+                if (currentThreadId === id) {
+                    currentThreadId = Object.keys(threads)[0];
+                    localStorage.setItem('cassiopeia_current_thread', currentThreadId);
+                }
+                renderThreadTabs();
+                loadThread(currentThreadId);
+            }
+        }
+    }
+
+    function saveThreads() {
+        localStorage.setItem('cassiopeia_threads', JSON.stringify(threads));
+    }
+
+    // Settings
+    function openSettings() { document.getElementById('settings-modal').style.display = 'flex'; }
+    function closeSettings() { document.getElementById('settings-modal').style.display = 'none'; }
+    
+    function saveSettings() {
+        apiKey = document.getElementById('api-key').value.trim();
+        selectedModel = document.getElementById('model-select').value;
+        localStorage.setItem('openrouter_api_key', apiKey);
+        localStorage.setItem('openrouter_model', selectedModel);
+        closeSettings();
+    }
+
+    function clearCurrentThread() {
+        if(confirm("Clear this thread's messages?")) {
+            threads[currentThreadId].messages = [];
+            saveThreads();
+            loadThread(currentThreadId);
+            closeSettings();
+        }
+    }
+
+    // Prompt editor
+    function openPromptModal() { 
+        document.getElementById('system-prompt-input').value = systemPrompt;
+        document.getElementById('prompt-modal').style.display = 'flex'; 
+    }
+    function closePromptModal() { document.getElementById('prompt-modal').style.display = 'none'; }
+    
+    function savePrompt() {
+        systemPrompt = document.getElementById('system-prompt-input').value;
+        localStorage.setItem('cassiopeia_prompt', systemPrompt);
+        closePromptModal();
+    }
+    
+    function resetPrompt() {
+        if (confirm('Reset to default Claudio prompt?')) {
+            document.getElementById('system-prompt-input').value = DEFAULT_PROMPT;
+        }
+    }
+
+    // Backup modal
+    function openBackupModal() { document.getElementById('backup-modal').style.display = 'flex'; }
+    function closeBackupModal() { document.getElementById('backup-modal').style.display = 'none'; }
+
+    // Full backup export
+    function exportFullBackup() {
+        const backup = {
+            version: 'observatorio-v1',
+            exportDate: new Date().toISOString(),
+            threads: threads,
+            currentThreadId: currentThreadId,
+            systemPrompt: systemPrompt,
+            memory: memoryText,
+            selectedModel: selectedModel
+            // Note: API key NOT included for security
+        };
+        
+        const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `observatorio-backup-${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        alert('✅ Backup saved! Store this file safely.');
+        closeBackupModal();
+    }
+
+    // Import backup
+    function importBackup(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const backup = JSON.parse(e.target.result);
+                
+                if (!backup.threads) {
+                    throw new Error('Invalid backup file');
+                }
+                
+                if (confirm('This will replace all current data. Continue?')) {
+                    // Restore data
+                    threads = backup.threads;
+                    currentThreadId = backup.currentThreadId || Object.keys(threads)[0];
+                    systemPrompt = backup.systemPrompt || DEFAULT_PROMPT;
+                    memoryText = backup.memory || '';
+                    selectedModel = backup.selectedModel || 'anthropic/claude-opus-4-5';
+                    
+                    // Save to localStorage
+                    localStorage.setItem('cassiopeia_threads', JSON.stringify(threads));
+                    localStorage.setItem('cassiopeia_current_thread', currentThreadId);
+                    localStorage.setItem('cassiopeia_prompt', systemPrompt);
+                    localStorage.setItem('cassiopeia_memory', memoryText);
+                    localStorage.setItem('openrouter_model', selectedModel);
+                    
+                    // Update UI
+                    document.getElementById('system-prompt-input').value = systemPrompt;
+                    document.getElementById('memory-input').value = memoryText;
+                    document.getElementById('model-select').value = selectedModel;
+                    
+                    renderThreadTabs();
+                    loadThread(currentThreadId);
+                    
+                    alert('✅ Backup restored!');
+                    closeBackupModal();
+                }
+            } catch (err) {
+                alert('❌ Error reading backup file: ' + err.message);
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+    }
+
+    // Export chat transcript
+    function exportChat() {
+        const thread = threads[currentThreadId];
+        let text = `# ${thread.name}\n# Exported from El Observatorio\n# ${new Date().toLocaleString()}\n\n`;
+        
+        thread.messages.forEach(msg => {
+            const role = msg.role === 'user' ? 'Capitana' : 'Claudio';
+            const time = msg.timestamp || '';
+            text += `[${role}] ${time}\n${msg.content}\n`;
+            if (msg.image) text += `[Image attached]\n`;
+            text += `\n`;
+        });
+        
+        const blob = new Blob([text], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${thread.name.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // Chat UI
+    function addMessageToUI(text, sender, timestamp, imageData) {
+        const container = document.getElementById('chat-container');
+        const div = document.createElement('div');
+        div.className = `message ${sender}`;
+        
+        if (imageData) {
+            const img = document.createElement('img');
+            img.src = imageData;
+            div.appendChild(img);
+        }
+        
+        const content = document.createElement('div');
+        content.textContent = text;
+        div.appendChild(content);
+        
+        if (timestamp) {
+            const time = document.createElement('div');
+            time.className = 'timestamp';
+            time.textContent = timestamp;
+            div.appendChild(time);
+        }
+        
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function autoResizeTextarea() {
+        const tx = document.getElementById('user-input');
+        tx.addEventListener('input', autoResizeTextareaManual);
+    }
+    
+    function autoResizeTextareaManual() {
+        const tx = document.getElementById('user-input');
+        tx.style.height = 'auto';
+        tx.style.height = Math.min(tx.scrollHeight, 120) + 'px';
+        if(tx.value === '') tx.style.height = '42px';
+    }
+
+    function getTimestamp() {
+        return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('user-input');
+        const message = input.value.trim();
+        if (!message && !pendingImage) return;
+
+        if (!apiKey) {
+            alert('API Key needed. Tap ⚙️ to add your OpenRouter key.');
+            openSettings();
+            return;
+        }
+
+        const timestamp = getTimestamp();
+        const imageToSend = pendingImage;
+        
+        addMessageToUI(message, 'user', timestamp, imageToSend?.base64);
+        
+        const storedMsg = { role: 'user', content: message, timestamp };
+        if (imageToSend) storedMsg.image = imageToSend.base64;
+        threads[currentThreadId].messages.push(storedMsg);
+        saveThreads();
+        
+        input.value = '';
+        input.style.height = '42px';
+        removeImage();
+
+        document.getElementById('typing').style.display = 'block';
+        document.getElementById('send-btn').disabled = true;
+
+        const apiMessages = [];
+        
+        let fullSystemPrompt = systemPrompt;
+        if (memoryText.trim()) {
+            fullSystemPrompt += `\n\n--- Persistent Memory ---\n${memoryText}`;
+        }
+        
+        threads[currentThreadId].messages.forEach(m => {
+            if (m.image) {
+                apiMessages.push({
+                    role: m.role,
+                    content: [
+                        { type: 'image_url', image_url: { url: m.image } },
+                        { type: 'text', text: m.content || '(image)' }
+                    ]
+                });
+            } else {
+                apiMessages.push({ role: m.role, content: m.content });
+            }
+        });
+
+        try {
+            const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`,
+                    'HTTP-Referer': window.location.href,
+                    'X-Title': 'El Observatorio'
+                },
+                body: JSON.stringify({
+                    model: selectedModel,
+                    max_tokens: 2048,
+                    messages: [
+                        { role: 'system', content: fullSystemPrompt },
+                        ...apiMessages
+                    ]
+                })
+            });
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error?.message || `API Error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const botReply = data.choices[0].message.content;
+            const botTimestamp = getTimestamp();
+
+            addMessageToUI(botReply, 'bot', botTimestamp);
+            threads[currentThreadId].messages.push({ role: 'assistant', content: botReply, timestamp: botTimestamp });
+            saveThreads();
+
+        } catch (error) {
+            addMessageToUI(`⚠️ ${error.message}`, 'bot', getTimestamp());
+            console.error(error);
+        } finally {
+            document.getElementById('typing').style.display = 'none';
+            document.getElementById('send-btn').disabled = false;
+        }
+    }
+
+    document.getElementById('user-input').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+</script>
+
+</body>
+</html>
